@@ -66,6 +66,7 @@ open class HomeActivity : MifosBaseActivity(), NavigationView.OnNavigationItemSe
         binding.navView.setupWithNavController(binding.navHostFragment.findNavController())
     }
 
+
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // ignore the current selected item
         /*if (item.isChecked()) {
