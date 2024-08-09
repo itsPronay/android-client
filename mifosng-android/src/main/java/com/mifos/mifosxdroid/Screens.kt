@@ -132,72 +132,44 @@ sealed class Screens(
         route = "loan_charge_screen"
     )
 
-    data object LoanChargeDialogScreen : Screens(
-        route = "loan_charge_dialog_screen"
-    )
+    data object LoanChargeDialogScreen : Screens(route = "loan_charge_dialog_screen")
 
-    data object LoanDisbursementScreen : Screens(
-        title = "Disburse Loan",
-        route = "loan_disbursement_screen"
-    )
+    data object LoanDisbursementScreen : Screens(route = "loan_disbursement_screen")
 
-    data object LoanRepaymentScreen : Screens(
-        title = "Repayment",
-        route = "loan_repayment_screen"
-    )
+    data object LoanRepaymentScreen : Screens(route = "loan_repayment_screen")
 
-    data object LoanRepaymentScheduleScreen : Screens(
-        title = "Loan Repayment Schedule",
-        route = "loan_repayment_schedule_screen"
-    )
+    data object LoanRepaymentScheduleScreen : Screens(route = "loan_repayment_schedule_screen")
 
-    data object LoanTransactionScreen : Screens(
-        title = "Loan Transactions",
-        route = "loan_transactionScreen"
-    )
+    data object LoanTransactionScreen : Screens(route = "loan_transactionScreen")
 
-    data object GroupDetailsScreen : Screens(
-        route = "group_details_screen",
-        title = "Group"
-    )
+    data object GroupDetailsScreen : Screens(route = "group_details_screen",)
 
-    data object CreateNewGroupScreen : Screens(
-        title = "Create New Group",
-        route = "create_new_group_screen"
-    )
+    data object CreateNewGroupScreen : Screens(title = "Create New Group", route = "create_new_group_screen")
 
-    data object SyncGroupPayloadsScreen : Screens(
-        route = "sync_group_payloads_screen"
-    )
+    data object SyncGroupPayloadsScreen : Screens(route = "sync_group_payloads_screen")
 
-    data object CenterDetailsScreen : Screens(
-        route = "center_details_screen"
-    )
+    data object CenterDetailsScreen : Screens(route = "center_details_screen")
 
-    data object ActivateScreen : Screens(
-        route = "activate_screen"
-    )
+    data object ActivateScreen : Screens(route = "activate_screen")
 
-    data object NotesScreen : Screens(
-        route = "notes_screen"
-    )
+    data object NotesScreen : Screens(route = "notes_screen")
 
-    data object GroupLoanAccountScreen : Screens(
-        route = "group_loan_account_screen"
-    )
+    data object GroupLoanAccountScreen : Screens(route = "group_loan_account_screen")
 
-    data object DocumentsScreen : Screens(
-        route = "documents_screen"
-    )
+    data object DocumentsScreen : Screens(route = "documents_screen")
 
-    data object DataTableScreen : Screens(
-        route = "datatable_screen"
-    )
+    data object DataTableScreen : Screens(route = "datatable_screen")
 
-    data object DataTableDataScreen : Screens(
-        route = "datatable_data_screen"
-    )
+    data object DataTableDataScreen : Screens(route = "datatable_data_screen")
 
+    data object ClientDetailsScreen : Screens(route = "Client_details_screen")
 
+    data object SavingsAccountScreen : Screens(route = "savings_account_screen")
+
+    data object DocumentListScreen : Screens(route = "document_list_screen")
+
+    data object ClientIdentifiersScreen : Screens(route = "client_identifiers_screen")
+
+    data object UploadSignatureScreen : Screens( route = "upload_signature_screen")
 }
 

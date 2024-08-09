@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.fragment.findNavController
 import com.mifos.core.common.utils.Constants
 import com.mifos.core.ui.components.FabType
 import com.mifos.feature.about.AboutScreen
@@ -16,7 +17,10 @@ import com.mifos.feature.center.center_group_list.GroupListScreen
 import com.mifos.feature.center.center_list.ui.CenterListScreen
 import com.mifos.feature.center.create_center.CreateNewCenterScreen
 import com.mifos.feature.checker_inbox_task.checker_inbox_tasks.ui.CheckerInboxTasksScreen
+import com.mifos.feature.client.clientDetails.ui.ClientDetailsScreen
+import com.mifos.feature.client.clientIdentifiers.ClientIdentifiersScreen
 import com.mifos.feature.client.clientList.presentation.ClientListScreen
+import com.mifos.feature.client.clientSignature.SignatureScreen
 import com.mifos.feature.document.document_list.DocumentListScreen
 import com.mifos.feature.groups.create_new_group.CreateNewGroupScreen
 import com.mifos.feature.groups.group_details.GroupDetailsScreen
@@ -36,8 +40,9 @@ import com.mifos.feature.savings.account_summary.SavingsAccountSummaryScreen
 import com.mifos.feature.search.SearchScreenRoute
 import com.mifos.feature.settings.settings.SettingsScreen
 import com.mifos.mifosxdroid.Screens
+import com.mifos.mifosxdroid.online.clientidentifiers.ClientIdentifiersFragmentDirections
 import com.mifos.mifosxdroid.online.datatable.DataTableScreen
-import com.mifos.mifosxdroid.online.savingaccountsummary.SavingsAccountSummaryScreen
+import com.mifos.mifosxdroid.online.search.SearchFragmentDirections
 
 @Composable
 fun Navigation(navController: NavHostController, padding: PaddingValues) {
@@ -59,17 +64,19 @@ fun Navigation(navController: NavHostController, padding: PaddingValues) {
                             TODO()
                         }
 
-                        Constants.SEARCH_ENTITY_CENTER -> {
-                            TODO()
-                        }
+                        Constants.SEARCH_ENTITY_CENTER -> navController.navigate(Screens.CenterDetailsScreen.route + "/${searchedEntity.entityId}")
+
 
                         Constants.SEARCH_ENTITY_SAVING -> {
                             TODO()
                         }
 
                         Constants.SEARCH_ENTITY_GROUP -> {
-                            TODO()
+                            if (searchedEntity.entityName != null) {
+                                navController.navigate(Screens.GroupDetailsScreen.route + "/${searchedEntity.entityId}/${searchedEntity.entityName}")
+                            }
                         }
+
 
                         Constants.SEARCH_ENTITY_CLIENT -> {
                             TODO()
@@ -78,12 +85,77 @@ fun Navigation(navController: NavHostController, padding: PaddingValues) {
                 }
             )
         }
-        composable(Screens.ClientListScreen.route) {
+        composable(Screens.ClientListScreen.route) {  /** TODO() // takes List<Client> **/
             ClientListScreen(
                 paddingValues = padding,
                 createNewClient = {},
                 syncClicked = {},
-                onClientSelect = {}
+                onClientSelect = {
+                    navController.navigate(Screens.ClientDetailsScreen.route + "/${it.id}")
+                }
+            )
+            /** TODO() implementation of this part | view clientListFragment**/
+//            private val arg: ClientListFragmentArgs by navArgs()
+//            private lateinit var clientList: List<Client>
+//            private var isParentFragment = false
+//
+//            override fun onCreate(savedInstanceState: Bundle?) {
+//                super.onCreate(savedInstanceState)
+//
+//                if (arguments != null) {
+//                    clientList = arg.clientListArgs.clientsList
+//                    isParentFragment = arg.clientListArgs.isParentFragment
+//                }
+//
+//                if (!isParentFragment) (activity as HomeActivity).supportActionBar?.title =
+//                    getString(R.string.clients)
+//            }
+        }
+
+        composable(Screens.DocumentListScreen.route + "/{entityType}/{entityId}") { backStackEntry ->
+            val entityType = backStackEntry.arguments?.getString("entityType") ?: ""
+            val entityId = backStackEntry.arguments?.getString("entityId")?.toIntOrNull() ?: 0
+
+            DocumentListScreen(
+                entityType = entityType,
+                entityId = entityId,
+                onBackPressed = { navController.navigateUp() }
+            )
+        }
+
+        composable(Screens.ClientIdentifiersScreen.route + "/{clientId}") { backStackEntry ->
+            val clientId = backStackEntry.arguments?.getString("clientId")?.toIntOrNull() ?: 0
+
+            ClientIdentifiersScreen(
+                clientId = clientId,
+                onBackPressed = { navController.navigateUp() },
+                onDocumentClicked = { identifierId ->
+                    navController.navigate(Screens.DocumentListScreen.route + "/$identifierId/${Constants.ENTITY_TYPE_CLIENTS}")
+                }
+            )
+        }
+
+        composable(Screens.ClientDetailsScreen.route + "/{clientId}") { backStackEntry ->
+            val clientId = (backStackEntry.arguments?.getString("clientId"))?.toIntOrNull() ?: 0
+
+            ClientDetailsScreen(
+                clientId = clientId,
+                onBackPressed = { navController.navigateUp() },
+                addLoanAccount = { navController.navigate(Screens.LoanAccountScreen.route + "/$clientId") },
+                addSavingsAccount = { navController.navigate(Screens.SavingsAccountScreen.route + "/$clientId") },
+                charges = {},
+                documents = { navController.navigate(Screens.DocumentListScreen.route + "/$clientId/${Constants.ENTITY_TYPE_CLIENTS}") },
+                identifiers = { navController.navigate(Screens.ClientIdentifiersScreen.route + "/$clientId") },
+                moreClientInfo = { navController.navigate(Screens.DataTableScreen.route + "/$clientId/${Constants.DATA_TABLE_NAME_CLIENT}") },
+                notes = { navController.navigate(Screens.NotesScreen.route + "/$clientId/${Constants.ENTITY_TYPE_CLIENTS}") },
+                pinpointLocation = {},
+                survey = { },
+                uploadSignature = { navController.navigate(Screens.UploadSignatureScreen.route + "/$clientId") },
+                loanAccountSelected = {loanAccountNumber ->
+                    navController.navigate(Screens.LoanAccountSummaryScreen.route + "/$loanAccountNumber")
+                },
+                savingsAccountSelected = { _, _ -> },
+                activateClient = { navController.navigate(Screens.ActivateScreen.route + "/$clientId/${Constants.ACTIVATE_CLIENT}") }
             )
         }
         composable(Screens.CenterListScreen.route) {
@@ -98,8 +170,18 @@ fun Navigation(navController: NavHostController, padding: PaddingValues) {
                 }
             )
         }
-        composable(Screens.CenterDetailsScreen.route + "/{centerId}") {
-            val centerId = (it.arguments?.getString("centerId"))?.toIntOrNull() ?: 0
+
+        composable(Screens.UploadSignatureScreen.route + "/{clientId}"){ backStackEntry ->
+            val clientId = (backStackEntry.arguments?.getString("clientId"))?.toIntOrNull() ?: 0
+
+            SignatureScreen(
+                clientId = clientId,
+                onBackPressed = { navController.navigateUp() }
+            )
+        }
+
+        composable(Screens.CenterDetailsScreen.route + "/{centerId}") { backStackEntry ->
+            val centerId = (backStackEntry.arguments?.getString("centerId"))?.toIntOrNull() ?: 0
             CenterDetailsScreen(
                 centerId = centerId,
                 onBackPressed = { navController.navigateUp() },
@@ -109,8 +191,8 @@ fun Navigation(navController: NavHostController, padding: PaddingValues) {
             )
         }
 
-        composable(Screens.CenterGroupListScreen.route + "/{centerId}") {
-            val centerId = (it.arguments?.getString("centerId"))?.toIntOrNull() ?: 0
+        composable(Screens.CenterGroupListScreen.route + "/{centerId}") { backStackEntry ->
+            val centerId = (backStackEntry.arguments?.getString("centerId"))?.toIntOrNull() ?: 0
             GroupListScreen(
                 centerId = centerId,
                 onBackPressed = { navController.navigateUp() },
@@ -128,53 +210,55 @@ fun Navigation(navController: NavHostController, padding: PaddingValues) {
                 onSyncClick = { TODO() }
             )
         }
-        composable(Screens.GroupDetailsScreen.route + "/{groupId}/{groupName}") {
-            val groupId = (it.arguments?.getString("groupId"))?.toIntOrNull() ?: 0
-            val groupName = it.arguments?.getString("groupName") ?: ""
+        composable(Screens.GroupDetailsScreen.route + "/{groupId}/{groupName}") { backStackEntry->
+            val groupId = (backStackEntry.arguments?.getString("groupId"))?.toIntOrNull() ?: 0
+            val groupName = backStackEntry.arguments?.getString("groupName") ?: ""
 
             GroupDetailsScreen(
                 groupId = groupId,
                 onBackPressed = { navController.navigateUp() },
                 addLoanAccount = { navController.navigate(Screens.GroupLoanAccountScreen.route + "/$groupId") },
-                addSavingsAccount = { },
+                addSavingsAccount = { TODO() },
                 documents = { navController.navigate(Screens.DocumentsScreen.route + "/$groupId/${Constants.ENTITY_TYPE_GROUPS}") },
-                groupClients = { },
+                groupClients = {  TODO() },
                 moreGroupInfo = { navController.navigate(Screens.DataTableScreen.route + "/$groupId/${Constants.DATA_TABLE_NAME_GROUP}") },
                 notes = { navController.navigate(Screens.NotesScreen.route + "/$groupId/${Constants.ENTITY_TYPE_GROUPS}") },
                 loanAccountSelected = { loanAccountNumber ->
-                    navController.navigate(Screens.LoanAccountSummaryScreen.route + "/$loanAccountNumber") },
-                savingsAccountSelected = { savingsAccountNumber , depositType ->
+                    navController.navigate(Screens.LoanAccountSummaryScreen.route + "/$loanAccountNumber")
+                },
+                savingsAccountSelected = { savingsAccountNumber, depositType ->
                     navController.navigate(Screens.SavingsAccountSummaryScreen.route + "/$savingsAccountNumber/${depositType}")
                 },
                 activateGroup = { navController.navigate(Screens.ActivateScreen.route + "/$groupId/${Constants.ACTIVATE_GROUP}") }
             )
         }
 
-        composable(Screens.SavingsAccountSummaryScreen.route + "/{savingsAccountNumber}/{depositType}"){
-            val savingsAccountNumber = it.arguments?.getString("savingsAccountNumber")?.toIntOrNull() ?: 0
-            val depositType = it.arguments?.getString("depositType")
+        composable(Screens.SavingsAccountSummaryScreen.route + "/{savingsAccountNumber}/{depositType}") { backStackEntry ->
+            val savingsAccountNumber = backStackEntry.arguments?.getString("savingsAccountNumber")?.toIntOrNull() ?: 0
+            val depositType = backStackEntry.arguments?.getString("depositType")
 
             SavingsAccountSummaryScreen(
                 accountId = savingsAccountNumber,
-                savingsAccountType = null  , //fix it
+                savingsAccountType = null, //fix it TODO(),
                 navigateBack = { navController.navigateUp() },
-                loadMoreSavingsAccountInfo = { 0 } ,
+                loadMoreSavingsAccountInfo = { 0 },
                 loadDocuments = { 0 },
-                onDepositClick = { _ , _ -> },
-                onWithdrawButtonClicked = { _ , _ -> },
-                approveSavings = { _ , _ -> },
-                activateSavings = { _ , _ -> }
+                onDepositClick = { _, _ -> },
+                onWithdrawButtonClicked = { _, _ -> },
+                approveSavings = { _, _ -> },
+                activateSavings = { _, _ -> }
             )
         }
 
-        composable(Screens.LoanAccountSummaryScreen.route + "/{loanAccountNumber}"){
-            val loanAccountNumber = it.arguments?.getString("loanAccountNumber")?.toIntOrNull() ?: 0
+        composable(Screens.LoanAccountSummaryScreen.route + "/{loanAccountNumber}") { backStackEntry ->
+            val loanAccountNumber = backStackEntry.arguments?.getString("loanAccountNumber")?.toIntOrNull() ?: 0
+
             LoanAccountSummaryScreen(
                 loanAccountNumber = loanAccountNumber,
                 navigateBack = { navController.navigateUp() },
                 onMoreInfoClicked = { /*TODO*/ },
                 onTransactionsClicked = { },
-                onRepaymentScheduleClicked = { } ,
+                onRepaymentScheduleClicked = { },
                 onDocumentsClicked = { /*TODO*/ },
                 onChargesClicked = { /*TODO*/ },
                 approveLoan = { },
@@ -182,9 +266,9 @@ fun Navigation(navController: NavHostController, padding: PaddingValues) {
             }
         }
 
-        composable(Screens.DataTableScreen.route + "/{entityId}/{dataTableName}" ){
-            val entityId = (it.arguments?.getString("entityId"))?.toIntOrNull() ?: 0
-            val dataTableName = (it.arguments?.getString("dataTableName"))
+        composable(Screens.DataTableScreen.route + "/{entityId}/{dataTableName}") { backStackEntry->
+            val entityId = (backStackEntry.arguments?.getString("entityId"))?.toIntOrNull() ?: 0
+            val dataTableName = (backStackEntry.arguments?.getString("dataTableName"))
 
             DataTableScreen(
                 tableName = dataTableName,
@@ -193,13 +277,13 @@ fun Navigation(navController: NavHostController, padding: PaddingValues) {
             )
         }
 
-        composable(Screens.DataTableDataScreen.route + "/{dataTable}"){
+        composable(Screens.DataTableDataScreen.route + "/{dataTable}") {
 //            val dataTable : DataTable = (it.arguments?.get ("dataTableName"))
 
         }
-        composable(Screens.DocumentsScreen.route + "/{entityId}/{entityType}") {
-            val entityId = (it.arguments?.getString("entityId"))?.toIntOrNull() ?: 0
-            val entityType = (it.arguments?.getString("entityType")) ?: ""
+        composable(Screens.DocumentsScreen.route + "/{entityId}/{entityType}") { backStackEntry->
+            val entityId = (backStackEntry.arguments?.getString("entityId"))?.toIntOrNull() ?: 0
+            val entityType = (backStackEntry.arguments?.getString("entityType")) ?: ""
 
             DocumentListScreen(
                 entityType = entityType,
@@ -208,28 +292,29 @@ fun Navigation(navController: NavHostController, padding: PaddingValues) {
             )
         }
 
-        composable(Screens.NotesScreen.route + "/{groupId}/{entityType}") {
-            val groupId = (it.arguments?.getString("groupId"))?.toIntOrNull() ?: 0
-            val entityType = (it.arguments?.getString("entityType"))
+        composable(Screens.NotesScreen.route + "/{id}/{entityType}") { backStackEntry->
+            val id = (backStackEntry.arguments?.getString("id"))?.toIntOrNull() ?: 0
+            val entityType = (backStackEntry.arguments?.getString("entityType"))
+
             NoteScreen(
-                entityId = groupId,
+                entityId = id,
                 entityType = entityType,
                 onBackPressed = { navController.navigateUp() }
             )
         }
 
-        composable(Screens.GroupLoanAccountScreen.route + "/groupId") {
+        composable(Screens.GroupLoanAccountScreen.route + "/groupId") { backStackEntry->
 //            TODO() fix crash
-            val groupId = (it.arguments?.getString("groupId"))?.toIntOrNull() ?: 0
+            val groupId = (backStackEntry.arguments?.getString("groupId"))?.toIntOrNull() ?: 0
             GroupLoanAccountScreen(
                 groupId = groupId,
                 onBackPressed = { navController.navigateUp() }
             )
         }
 
-        composable(Screens.ActivateScreen.route + "/{centerId}/{activateType}") {
-            val centerId = it.arguments?.getString("centerId")?.toIntOrNull() ?: 0
-            val activateType = (it.arguments?.getString("activateType")) ?: ""
+        composable(Screens.ActivateScreen.route + "/{centerId}/{activateType}") { backStackEntry->
+            val centerId = backStackEntry.arguments?.getString("centerId")?.toIntOrNull() ?: 0
+            val activateType = (backStackEntry.arguments?.getString("activateType")) ?: ""
             ActivateScreen(
                 id = centerId,
                 activateType = activateType,
