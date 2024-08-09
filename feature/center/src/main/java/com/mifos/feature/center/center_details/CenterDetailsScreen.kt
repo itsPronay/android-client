@@ -42,6 +42,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mifos.core.common.utils.Utils
@@ -67,8 +68,7 @@ fun CenterDetailsScreen(
     addSavingsAccount: (Int) -> Unit,
     groupList: (Int) -> Unit
 ) {
-
-    val viewModel: CenterDetailsViewModel = viewModel()
+    val viewModel: CenterDetailsViewModel = hiltViewModel()
     val state by viewModel.centerDetailsUiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {

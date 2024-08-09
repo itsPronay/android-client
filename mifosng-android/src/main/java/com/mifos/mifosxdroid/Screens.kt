@@ -91,4 +91,88 @@ sealed class Screens(
         route = "offline_sync_screen",
         icon = Icons.Rounded.PowerSettingsNew
     )
+
+    data object CreateNewCenterScreen : Screens(
+        title = "Create New Center",
+        route = "create_new_center_screen"
+    )
+
+    data object CreateNewClientScreen : Screens(
+        title = "Create New Client",
+        route = "create_new_client_screen"
+    )
+
+    data object LoanAccountScreen : Screens(
+        title = "Loan Application",
+        route = "loan_account_screen"
+    )
+
+    data object LoanAccountSummaryScreen : Screens(
+        title = "Loan Account Summary",
+        route = "loan_account_summary_screen"
+    )
+
+    data object LoanApprovalScreen : Screens(
+        title = "Approve Loan",
+        route = "loan_approval_screen"
+    )
+
+    data object LoanChargeScreen : Screens(
+        title = "Loan Charges",
+        route = "loan_charge_screen"
+    )
+
+    data object LoanChargeDialogScreen : Screens(
+        route = "loan_charge_dialog_screen"
+    )
+
+    data object LoanDisbursementScreen : Screens(
+        title = "Disburse Loan",
+        route = "loan_disbursement_screen"
+    )
+
+    data object LoanRepaymentScreen : Screens(
+        title = "Repayment",
+        route = "loan_repayment_screen"
+    )
+
+    data object LoanRepaymentScheduleScreen : Screens(
+        title = "Loan Repayment Schedule",
+        route = "loan_repayment_schedule_screen"
+    )
+
+    data object LoanTransactionScreen : Screens(
+        title = "Loan Transactions",
+        route = "loan_transactionScreen"
+    )
+
+    data object GroupDetailsScreen : Screens(
+        route = "group_details_screen",
+        title = "Group"
+    )
+
+    data object CreateNewGroupScreen : Screens(
+        title = "Create New Group",
+        route = "create_new_group_screen"
+    )
+
+    data object SyncGroupPayloadsScreen : Screens(
+        route = "sync_group_payloads_screen"
+    )
+
+    data object CenterDetailsScreen : Screens(
+        route = "center_details_screen"
+    )
+
+    data object ActivateScreen : Screens(
+        route = "activate_screen"
+    )
+
+    data object SavingsAccountFragment : Screens(
+        route = "savings_account_fragment"
+    )
+
+
+
 }
+
