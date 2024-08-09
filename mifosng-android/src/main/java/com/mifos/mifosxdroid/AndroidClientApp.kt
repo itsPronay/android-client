@@ -245,4 +245,5 @@ fun AndroidClientApp() {
             Navigation(navController = navController, padding = paddingValues)
         }
     }
+
 }
