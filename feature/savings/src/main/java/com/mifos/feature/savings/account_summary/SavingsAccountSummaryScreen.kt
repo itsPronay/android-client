@@ -75,6 +75,8 @@ import com.mifos.feature.savings.R
 
 @Composable
 fun SavingsAccountSummaryScreen(
+    accountId : Int,
+    savingsAccountType: DepositType?,
     navigateBack: () -> Unit,
     loadMoreSavingsAccountInfo: (accountNumber: Int) -> Unit,
     loadDocuments: (accountNumber: Int) -> Unit,
@@ -87,29 +89,29 @@ fun SavingsAccountSummaryScreen(
     val uiState by viewmodel.savingsAccountSummaryUiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(key1 = Unit) {
-        viewmodel.loadSavingAccount(viewmodel.savingsAccountType?.endpoint)
+        viewmodel.loadSavingAccount(accountId, savingsAccountType?.endpoint)
     }
 
     SavingsAccountSummaryScreen(
         uiState = uiState,
         navigateBack = navigateBack,
-        onRetry = { viewmodel.loadSavingAccount(viewmodel.savingsAccountType?.endpoint) },
-        loadMoreSavingsAccountInfo = { loadMoreSavingsAccountInfo.invoke(viewmodel.accountId) },
-        loadDocuments = { loadDocuments.invoke(viewmodel.accountId) },
+        onRetry = { viewmodel.loadSavingAccount(accountId, savingsAccountType?.endpoint) },
+        loadMoreSavingsAccountInfo = { loadMoreSavingsAccountInfo.invoke(accountId) },
+        loadDocuments = { loadDocuments.invoke(accountId) },
         onDepositButtonClicked = { savingsAccountWithAssociations: SavingsAccountWithAssociations ->
-            onDepositClick.invoke(savingsAccountWithAssociations, viewmodel.savingsAccountType)
+            onDepositClick.invoke(savingsAccountWithAssociations, savingsAccountType)
         },
         onWithdrawButtonClicked = { savingsAccountWithAssociations: SavingsAccountWithAssociations ->
             onWithdrawButtonClicked.invoke(
                 savingsAccountWithAssociations,
-                viewmodel.savingsAccountType
+                savingsAccountType
             )
         },
         approveSavings = {
-            approveSavings.invoke(viewmodel.savingsAccountType, viewmodel.accountId)
+            approveSavings.invoke(savingsAccountType, accountId)
         },
         activateSavings = {
-            activateSavings.invoke(viewmodel.savingsAccountType, viewmodel.accountId)
+            activateSavings.invoke(savingsAccountType, accountId)
         }
     )
 }

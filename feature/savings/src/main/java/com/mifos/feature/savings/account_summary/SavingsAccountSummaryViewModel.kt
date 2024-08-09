@@ -25,17 +25,13 @@ import javax.inject.Inject
 @HiltViewModel
 class SavingsAccountSummaryViewModel @Inject constructor(
     private val getSavingsAccountUseCase: GetSavingsAccountUseCase
-//    private val repository: SavingsAccountSummaryRepository
 ) : ViewModel() {
 
     private val _savingsAccountSummaryUiState =
         MutableStateFlow<SavingsAccountSummaryUiState>(SavingsAccountSummaryUiState.ShowProgressbar)
     val savingsAccountSummaryUiState: StateFlow<SavingsAccountSummaryUiState> get() = _savingsAccountSummaryUiState
 
-    var accountId = 0
-    var savingsAccountType: DepositType? = null
-
-    fun loadSavingAccount(type: String?) = viewModelScope.launch(Dispatchers.IO) {
+    fun loadSavingAccount(accountId : Int, type: String?) = viewModelScope.launch(Dispatchers.IO) {
         getSavingsAccountUseCase(type, accountId, Constants.TRANSACTIONS).collect { result ->
             when (result) {
                 is Resource.Error -> _savingsAccountSummaryUiState.value =

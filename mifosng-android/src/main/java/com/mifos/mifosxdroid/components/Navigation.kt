@@ -1,6 +1,5 @@
 package com.mifos.mifosxdroid.components
 
-import android.os.Bundle
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -8,9 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.fragment.findNavController
 import com.mifos.core.common.utils.Constants
-import com.mifos.core.objects.noncore.DataTable
 import com.mifos.core.ui.components.FabType
 import com.mifos.feature.about.AboutScreen
 import com.mifos.feature.activate.ActivateScreen
@@ -20,7 +17,6 @@ import com.mifos.feature.center.center_list.ui.CenterListScreen
 import com.mifos.feature.center.create_center.CreateNewCenterScreen
 import com.mifos.feature.checker_inbox_task.checker_inbox_tasks.ui.CheckerInboxTasksScreen
 import com.mifos.feature.client.clientList.presentation.ClientListScreen
-import com.mifos.feature.data_table.dataTableData.DataTableDataScreen
 import com.mifos.feature.document.document_list.DocumentListScreen
 import com.mifos.feature.groups.create_new_group.CreateNewGroupScreen
 import com.mifos.feature.groups.group_details.GroupDetailsScreen
@@ -36,13 +32,12 @@ import com.mifos.feature.loan.loan_transaction.LoanTransactionsScreen
 import com.mifos.feature.note.NoteScreen
 import com.mifos.feature.path_tracking.PathTrackingScreen
 import com.mifos.feature.report.run_report.RunReportScreen
+import com.mifos.feature.savings.account_summary.SavingsAccountSummaryScreen
 import com.mifos.feature.search.SearchScreenRoute
 import com.mifos.feature.settings.settings.SettingsScreen
 import com.mifos.mifosxdroid.Screens
 import com.mifos.mifosxdroid.online.datatable.DataTableScreen
 import com.mifos.mifosxdroid.online.savingaccountsummary.SavingsAccountSummaryScreen
-import com.mifos.mifosxdroid.online.savingsaccount.SavingsAccountScreen
-import kotlin.test.todo
 
 @Composable
 fun Navigation(navController: NavHostController, padding: PaddingValues) {
@@ -160,16 +155,17 @@ fun Navigation(navController: NavHostController, padding: PaddingValues) {
             val depositType = it.arguments?.getString("depositType")
 
             SavingsAccountSummaryScreen(
-                navigateBack = { /*TODO*/ },
-                loadMoreSavingsAccountInfo = { },
-                loadDocuments = { } ,
-                onDepositClick =  {_ , _ -> },
+                accountId = savingsAccountNumber,
+                savingsAccountType = null  , //fix it
+                navigateBack = { navController.navigateUp() },
+                loadMoreSavingsAccountInfo = { 0 } ,
+                loadDocuments = { 0 },
+                onDepositClick = { _ , _ -> },
                 onWithdrawButtonClicked = { _ , _ -> },
                 approveSavings = { _ , _ -> },
                 activateSavings = { _ , _ -> }
             )
         }
-
 
         composable(Screens.LoanAccountSummaryScreen.route + "/{loanAccountNumber}"){
             val loanAccountNumber = it.arguments?.getString("loanAccountNumber")?.toIntOrNull() ?: 0
