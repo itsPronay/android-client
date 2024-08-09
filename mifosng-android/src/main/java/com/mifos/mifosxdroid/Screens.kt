@@ -38,6 +38,11 @@ sealed class Screens(
         icon = Icons.Rounded.Business
     )
 
+    data object CenterGroupListScreen : Screens(
+        title = "Groups",
+        route = "center_group_list_screen",
+    )
+
     data object GroupListScreen : Screens(
         title = "Groups",
         route = "group_list_screen",
@@ -168,10 +173,25 @@ sealed class Screens(
         route = "activate_screen"
     )
 
-    data object SavingsAccountFragment : Screens(
-        route = "savings_account_fragment"
+    data object NotesScreen : Screens(
+        route = "notes_screen"
     )
 
+    data object GroupLoanAccountScreen : Screens(
+        route = "group_loan_account_screen"
+    )
+
+    data object DocumentsScreen : Screens(
+        route = "documents_screen"
+    )
+
+    data object DataTableScreen : Screens(
+        route = "datatable_screen"
+    )
+
+    data object DataTableDataScreen : Screens(
+        route = "datatable_data_screen"
+    )
 
 
 }
