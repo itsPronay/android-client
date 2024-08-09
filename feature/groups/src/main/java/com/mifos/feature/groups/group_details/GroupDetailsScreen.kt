@@ -80,7 +80,6 @@ import com.mifos.feature.groups.R
 
 @Composable
 fun GroupDetailsScreen(
-    groupName : String,
     groupId: Int,
     onBackPressed: () -> Unit,
     addLoanAccount: (Int) -> Unit,
@@ -112,7 +111,6 @@ fun GroupDetailsScreen(
     }
 
     GroupDetailsScreen(
-        groupName = groupName,
         groupId = groupId,
         state = state,
         loanAccounts = loanAccounts,
@@ -141,7 +139,6 @@ fun GroupDetailsScreen(
 
 @Composable
 fun GroupDetailsScreen(
-    groupName : String,
     groupId: Int,
     state: GroupDetailsUiState,
     loanAccounts: List<LoanAccount>,
@@ -159,7 +156,7 @@ fun GroupDetailsScreen(
 
     MifosScaffold(
         icon = MifosIcons.arrowBack,
-        title = stringResource(id = R.string.feature_groups_group) + " - " + groupName,
+        title = stringResource(id = R.string.feature_groups_group),
         onBackPressed = onBackPressed,
         actions = {
             IconButton(onClick = { showMenu = showMenu.not() }) {
@@ -733,7 +730,6 @@ private fun GroupDetailsScreenPreview(
     @PreviewParameter(GroupDetailsUiStateProvider::class) state: GroupDetailsUiState
 ) {
     GroupDetailsScreen(
-        groupName = "Admin Group",
         groupId = 1,
         state = state,
         onBackPressed = {},

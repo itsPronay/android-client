@@ -30,6 +30,7 @@ import com.mifos.feature.individual_collection_sheet.generate_collection_sheet.G
 import com.mifos.feature.individual_collection_sheet.individual_collection_sheet.ui.IndividualCollectionSheetScreen
 import com.mifos.feature.loan.group_loan_account.GroupLoanAccountScreen
 import com.mifos.feature.loan.loan_account.LoanAccountScreen
+import com.mifos.feature.loan.loan_account_summary.LoanAccountSummaryScreen
 import com.mifos.feature.loan.loan_charge.LoanChargeScreen
 import com.mifos.feature.loan.loan_transaction.LoanTransactionsScreen
 import com.mifos.feature.note.NoteScreen
@@ -39,6 +40,7 @@ import com.mifos.feature.search.SearchScreenRoute
 import com.mifos.feature.settings.settings.SettingsScreen
 import com.mifos.mifosxdroid.Screens
 import com.mifos.mifosxdroid.online.datatable.DataTableScreen
+import com.mifos.mifosxdroid.online.savingaccountsummary.SavingsAccountSummaryScreen
 import com.mifos.mifosxdroid.online.savingsaccount.SavingsAccountScreen
 import kotlin.test.todo
 
@@ -102,7 +104,7 @@ fun Navigation(navController: NavHostController, padding: PaddingValues) {
             )
         }
         composable(Screens.CenterDetailsScreen.route + "/{centerId}") {
-            val centerId = it.arguments?.getInt("centerId") ?: 0
+            val centerId = (it.arguments?.getString("centerId"))?.toIntOrNull() ?: 0
             CenterDetailsScreen(
                 centerId = centerId,
                 onBackPressed = { navController.navigateUp() },
@@ -113,7 +115,7 @@ fun Navigation(navController: NavHostController, padding: PaddingValues) {
         }
 
         composable(Screens.CenterGroupListScreen.route + "/{centerId}") {
-            val centerId = it.arguments?.getInt("centerId") ?: 0
+            val centerId = (it.arguments?.getString("centerId"))?.toIntOrNull() ?: 0
             GroupListScreen(
                 centerId = centerId,
                 onBackPressed = { navController.navigateUp() },
@@ -132,12 +134,11 @@ fun Navigation(navController: NavHostController, padding: PaddingValues) {
             )
         }
         composable(Screens.GroupDetailsScreen.route + "/{groupId}/{groupName}") {
-            val groupId = it.arguments?.getInt("groupId") ?: 0
+            val groupId = (it.arguments?.getString("groupId"))?.toIntOrNull() ?: 0
             val groupName = it.arguments?.getString("groupName") ?: ""
 
             GroupDetailsScreen(
                 groupId = groupId,
-                groupName = groupName,
                 onBackPressed = { navController.navigateUp() },
                 addLoanAccount = { navController.navigate(Screens.GroupLoanAccountScreen.route + "/$groupId") },
                 addSavingsAccount = { },
@@ -145,14 +146,48 @@ fun Navigation(navController: NavHostController, padding: PaddingValues) {
                 groupClients = { },
                 moreGroupInfo = { navController.navigate(Screens.DataTableScreen.route + "/$groupId/${Constants.DATA_TABLE_NAME_GROUP}") },
                 notes = { navController.navigate(Screens.NotesScreen.route + "/$groupId/${Constants.ENTITY_TYPE_GROUPS}") },
-                loanAccountSelected = {},
-                savingsAccountSelected = { _, _ -> },
+                loanAccountSelected = { loanAccountNumber ->
+                    navController.navigate(Screens.LoanAccountSummaryScreen.route + "/$loanAccountNumber") },
+                savingsAccountSelected = { savingsAccountNumber , depositType ->
+                    navController.navigate(Screens.SavingsAccountSummaryScreen.route + "/$savingsAccountNumber/${depositType}")
+                },
                 activateGroup = { navController.navigate(Screens.ActivateScreen.route + "/$groupId/${Constants.ACTIVATE_GROUP}") }
             )
         }
 
+        composable(Screens.SavingsAccountSummaryScreen.route + "/{savingsAccountNumber}/{depositType}"){
+            val savingsAccountNumber = it.arguments?.getString("savingsAccountNumber")?.toIntOrNull() ?: 0
+            val depositType = it.arguments?.getString("depositType")
+
+            SavingsAccountSummaryScreen(
+                navigateBack = { /*TODO*/ },
+                loadMoreSavingsAccountInfo = { },
+                loadDocuments = { } ,
+                onDepositClick =  {_ , _ -> },
+                onWithdrawButtonClicked = { _ , _ -> },
+                approveSavings = { _ , _ -> },
+                activateSavings = { _ , _ -> }
+            )
+        }
+
+
+        composable(Screens.LoanAccountSummaryScreen.route + "/{loanAccountNumber}"){
+            val loanAccountNumber = it.arguments?.getString("loanAccountNumber")?.toIntOrNull() ?: 0
+            LoanAccountSummaryScreen(
+                loanAccountNumber = loanAccountNumber,
+                navigateBack = { navController.navigateUp() },
+                onMoreInfoClicked = { /*TODO*/ },
+                onTransactionsClicked = { },
+                onRepaymentScheduleClicked = { } ,
+                onDocumentsClicked = { /*TODO*/ },
+                onChargesClicked = { /*TODO*/ },
+                approveLoan = { },
+                disburseLoan = { /*TODO*/ }) {
+            }
+        }
+
         composable(Screens.DataTableScreen.route + "/{entityId}/{dataTableName}" ){
-            val entityId = (it.arguments?.getInt("entityId")) ?: 0
+            val entityId = (it.arguments?.getString("entityId"))?.toIntOrNull() ?: 0
             val dataTableName = (it.arguments?.getString("dataTableName"))
 
             DataTableScreen(
@@ -167,8 +202,8 @@ fun Navigation(navController: NavHostController, padding: PaddingValues) {
 
         }
         composable(Screens.DocumentsScreen.route + "/{entityId}/{entityType}") {
-            val entityId = it.arguments?.getInt("entityId") ?: 0
-            val entityType = (it.arguments?.getString("entityType"))!!
+            val entityId = (it.arguments?.getString("entityId"))?.toIntOrNull() ?: 0
+            val entityType = (it.arguments?.getString("entityType")) ?: ""
 
             DocumentListScreen(
                 entityType = entityType,
@@ -178,7 +213,7 @@ fun Navigation(navController: NavHostController, padding: PaddingValues) {
         }
 
         composable(Screens.NotesScreen.route + "/{groupId}/{entityType}") {
-            val groupId = it.arguments?.getInt("groupId") ?: 0
+            val groupId = (it.arguments?.getString("groupId"))?.toIntOrNull() ?: 0
             val entityType = (it.arguments?.getString("entityType"))
             NoteScreen(
                 entityId = groupId,
@@ -188,7 +223,8 @@ fun Navigation(navController: NavHostController, padding: PaddingValues) {
         }
 
         composable(Screens.GroupLoanAccountScreen.route + "/groupId") {
-            val groupId = it.arguments?.getInt("groupId") ?: 0
+//            TODO() fix crash
+            val groupId = (it.arguments?.getString("groupId"))?.toIntOrNull() ?: 0
             GroupLoanAccountScreen(
                 groupId = groupId,
                 onBackPressed = { navController.navigateUp() }
@@ -196,8 +232,8 @@ fun Navigation(navController: NavHostController, padding: PaddingValues) {
         }
 
         composable(Screens.ActivateScreen.route + "/{centerId}/{activateType}") {
-            val centerId = (it.arguments?.getString("centerId"))!!.toInt()
-            val activateType = (it.arguments?.getString("activateType"))!!
+            val centerId = it.arguments?.getString("centerId")?.toIntOrNull() ?: 0
+            val activateType = (it.arguments?.getString("activateType")) ?: ""
             ActivateScreen(
                 id = centerId,
                 activateType = activateType,
@@ -310,7 +346,7 @@ fun Navigation(navController: NavHostController, padding: PaddingValues) {
         }
 
         composable(Screens.LoanTransactionScreen.route + "/{loanId}") {
-            val loanId = (it.arguments?.getString("loanId") ?: "0").toInt()
+            val loanId = it.arguments?.getString("loanId")?.toIntOrNull() ?: 0
             LoanTransactionsScreen(
                 loanId = loanId,
                 navigateBack = { navController.navigateUp() }

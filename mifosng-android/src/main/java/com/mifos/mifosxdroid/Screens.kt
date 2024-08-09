@@ -117,6 +117,11 @@ sealed class Screens(
         route = "loan_account_summary_screen"
     )
 
+    data object SavingsAccountSummaryScreen : Screens(
+        title = "Savings Account Summary",
+        route = "savings_account_summary_screen"
+    )
+
     data object LoanApprovalScreen : Screens(
         title = "Approve Loan",
         route = "loan_approval_screen"

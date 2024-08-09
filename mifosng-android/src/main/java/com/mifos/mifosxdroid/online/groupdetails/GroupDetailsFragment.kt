@@ -43,7 +43,6 @@ class GroupDetailsFragment : MifosBaseFragment() {
             )
             setContent {
                 GroupDetailsScreen(
-                    groupName = "",
                     groupId = groupId,
                     onBackPressed = {
                         requireActivity().onBackPressed()

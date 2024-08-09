@@ -28,7 +28,7 @@ class SavingsAccountSummaryViewModel @Inject constructor(private val repository:
     var accountId = 0
     var savingsAccountType: DepositType? = null
 
-    fun loadSavingAccount(type: String?) {
+    fun loadSavingAccount(type: String?, accountId : Int) {
         _savingsAccountSummaryUiState.value = SavingsAccountSummaryUiState.ShowProgressbar
         repository.getSavingsAccount(type, accountId, Constants.TRANSACTIONS)
             .observeOn(AndroidSchedulers.mainThread())
