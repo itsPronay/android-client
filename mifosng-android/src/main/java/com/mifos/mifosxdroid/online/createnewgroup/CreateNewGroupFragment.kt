@@ -46,8 +46,7 @@ class CreateNewGroupFragment : MifosBaseFragment() {
             )
             /**
              * On group creation [InvocationTargetException] exception is thrown And app crashes
-             * Original XML design fragment had this bug. Not sure if it's a bug or intentional.
-             * I am leaving it as it is.
+             * Original XML design fragment had this bug. I am leaving it as it is
              */
             startActivity(groupActivityIntent)
         }

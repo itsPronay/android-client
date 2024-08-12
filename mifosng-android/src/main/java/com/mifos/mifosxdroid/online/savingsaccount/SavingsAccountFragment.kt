@@ -28,13 +28,13 @@ import dagger.hilt.android.AndroidEntryPoint
 class SavingsAccountFragment : MifosBaseFragment() {
 
     private val arg: SavingsAccountFragmentArgs by navArgs()
-    val viewmodel : SavingAccountViewModel by viewModels()
+    val viewmodel: SavingAccountViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewmodel.clientId = arg.id
-        viewmodel.groupId = arg.id
-        viewmodel.isGroupAccount = arg.isGroupAccount
+//        viewmodel.clientId = arg.id
+//        viewmodel.groupId = arg.id
+//        viewmodel.isGroupAccount = arg.isGroupAccount
     }
 
     override fun onCreateView(
@@ -45,9 +45,12 @@ class SavingsAccountFragment : MifosBaseFragment() {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                SavingsAccountScreen {
-                    findNavController().popBackStack()
-                }
+                SavingsAccountScreen(
+                    groupId = arg.id,
+                    clientId = arg.id,
+                    isGroupAccount = arg.isGroupAccount,
+                    navigateBack = {}
+                )
             }
         }
     }

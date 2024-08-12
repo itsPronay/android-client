@@ -79,7 +79,7 @@ import com.mifos.core.objects.group.Group
 import com.mifos.feature.groups.R
 
 @Composable
-fun GroupDetailsScreen(
+fun GroupDetailsScreenRoute(
     groupId: Int,
     onBackPressed: () -> Unit,
     addLoanAccount: (Int) -> Unit,

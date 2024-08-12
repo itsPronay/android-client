@@ -273,11 +273,11 @@ class OfflineDashboardFragment : MifosBaseFragment() {
     }
 
     private fun showProgressbar(b: Boolean) {
-        if (b) {
-            binding.pbOfflineDashboard.visibility = View.VISIBLE
-        } else {
-            binding.pbOfflineDashboard.visibility = View.GONE
-        }
+//        if (b) {
+//            binding.pbOfflineDashboard.visibility = View.VISIBLE
+//        } else {
+//            binding.pbOfflineDashboard.visibility = View.GONE
+//        }
     }
 
     /**

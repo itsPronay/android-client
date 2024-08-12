@@ -40,20 +40,8 @@ class SavingAccountViewModel @Inject constructor(
         MutableStateFlow<SavingAccountUiState>(SavingAccountUiState.ShowProgress)
     val savingAccountUiState: StateFlow<SavingAccountUiState> get() = _savingAccountUiState
 
-    var clientId = 0
-    var groupId = 0
-    var isGroupAccount = false
-
     private val _savingProductsTemplate = MutableStateFlow(SavingProductsTemplate())
     val savingProductsTemplate = _savingProductsTemplate.asStateFlow()
-
-    fun loadLoanTemplateByProduct(productId: Int) {
-        if (isGroupAccount) {
-            loadGroupSavingAccountTemplateByProduct(groupId, productId)
-        } else {
-            loadClientSavingAccountTemplateByProduct(clientId, productId)
-        }
-    }
 
     fun loadSavingsAccountsAndTemplate() =
         viewModelScope.launch(Dispatchers.IO) {
@@ -73,7 +61,7 @@ class SavingAccountViewModel @Inject constructor(
             }
         }
 
-    private fun loadClientSavingAccountTemplateByProduct(clientId: Int, productId: Int) =
+    fun loadClientSavingAccountTemplateByProduct(clientId: Int, productId: Int) =
         viewModelScope.launch(Dispatchers.IO) {
             getClientSavingsAccountTemplateByProductUseCase(clientId, productId).collect { result ->
                 when (result) {
@@ -88,7 +76,7 @@ class SavingAccountViewModel @Inject constructor(
             }
         }
 
-    private fun loadGroupSavingAccountTemplateByProduct(groupId: Int, productId: Int) =
+    fun loadGroupSavingAccountTemplateByProduct(groupId: Int, productId: Int) =
         viewModelScope.launch(Dispatchers.IO) {
             getGroupSavingsAccountTemplateByProductUseCase(groupId, productId).collect { result ->
                 when (result) {

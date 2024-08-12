@@ -79,6 +79,9 @@ import java.util.Locale
 
 @Composable
 fun SavingsAccountScreen(
+    groupId: Int,
+    clientId: Int,
+    isGroupAccount: Boolean,
     navigateBack: () -> Unit
 ) {
     val viewModel: SavingAccountViewModel = hiltViewModel()
@@ -97,14 +100,18 @@ fun SavingsAccountScreen(
             viewModel.loadSavingsAccountsAndTemplate()
         },
         onSavingsProductSelected = {
-            viewModel.loadLoanTemplateByProduct(it)
+            if (isGroupAccount) {
+                viewModel.loadGroupSavingAccountTemplateByProduct(groupId, it)
+            } else viewModel.loadClientSavingAccountTemplateByProduct(clientId, it)
         },
         fetchTemplate = {
-            viewModel.loadLoanTemplateByProduct(it)
+            if (isGroupAccount) {
+                viewModel.loadGroupSavingAccountTemplateByProduct(groupId, it)
+            } else viewModel.loadClientSavingAccountTemplateByProduct(clientId, it)
         },
-        clientId = viewModel.clientId,
-        groupId = viewModel.groupId,
-        isGroupAccount = viewModel.isGroupAccount,
+        clientId = clientId,
+        groupId = groupId,
+        isGroupAccount = isGroupAccount,
         createSavingsAccount = { savingsPayload ->
             viewModel.createSavingsAccount(savingsPayload)
         }
@@ -533,7 +540,8 @@ fun SavingsAccountContent(
                     savingsPayload.fieldOfficerId = fieldOfficerId
                     savingsPayload.nominalAnnualInterestRate = nominalAnnualInterest
                     savingsPayload.allowOverdraft = overDraftAllowed
-                    savingsPayload.nominalAnnualInterestRateOverdraft = nominalAnnualInterestOverdraft
+                    savingsPayload.nominalAnnualInterestRateOverdraft =
+                        nominalAnnualInterestOverdraft
                     savingsPayload.overdraftLimit = maximumOverdraftAmount
                     savingsPayload.minOverdraftForInterestCalculation = minimumOverdraftAmount
                     savingsPayload.enforceMinRequiredBalance = enforceMinimumBalance
@@ -559,15 +567,17 @@ class SavingsAccountScreenPreviewProvider : PreviewParameterProvider<SavingAccou
     override val values: Sequence<SavingAccountUiState>
         get() = sequenceOf(
             SavingAccountUiState.ShowProgress,
-            SavingAccountUiState.LoadAllSavings(SavingProductsAndTemplate(
-                mProductSavings = listOf(
-                    ProductSavings(
-                        id = 0,
-                        name = "Product"
-                    )
-                ),
-                mSavingProductsTemplate = SavingProductsTemplate()
-            )),
+            SavingAccountUiState.LoadAllSavings(
+                SavingProductsAndTemplate(
+                    mProductSavings = listOf(
+                        ProductSavings(
+                            id = 0,
+                            name = "Product"
+                        )
+                    ),
+                    mSavingProductsTemplate = SavingProductsTemplate()
+                )
+            ),
             SavingAccountUiState.ShowFetchingErrorString("Failed to fetch"),
             SavingAccountUiState.ShowSavingsAccountCreatedSuccessfully(Savings()),
             SavingAccountUiState.ShowFetchingError(R.string.feature_savings_failed_to_fetch_savings_template)
@@ -582,7 +592,7 @@ fun PreviewSavingsAccountScreen(
     SavingsAccountScreen(
         uiState = savingAccountUiState,
         savingProductsTemplate = SavingProductsTemplate(),
-        onSavingsProductSelected = { } ,
+        onSavingsProductSelected = { },
         navigateBack = { },
         onRetry = { },
         fetchTemplate = { },
