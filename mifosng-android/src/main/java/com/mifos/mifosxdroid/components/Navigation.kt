@@ -19,8 +19,10 @@ import com.mifos.feature.client.navigation.clientNavGraph
 import com.mifos.feature.client.navigation.navigateClientDetailsScreen
 import com.mifos.feature.client.navigation.navigateCreateClientScreen
 import com.mifos.feature.client.navigation.navigateToClientListScreen
+import com.mifos.feature.data_table.dataTableList.FormWidget
 
 import com.mifos.feature.data_table.navigation.dataTableNavGraph
+import com.mifos.feature.data_table.navigation.navigateDataTableList
 import com.mifos.feature.data_table.navigation.navigateToDataTable
 
 
@@ -82,8 +84,7 @@ fun Navigation(
                 navController.navigateToDataTable(
                     Constants.DATA_TABLE_NAME_CLIENT,
                     it
-                )
-            },
+                )            },
             notes = { navController.navigateToNoteScreen(it, Constants.ENTITY_TYPE_CLIENTS) },
             loanAccountSelected = { navController.navigateToLoanAccountSummaryScreen(it) },
             savingsAccountSelected = { id, type ->
@@ -136,10 +137,7 @@ fun Navigation(
 
         addLoanAccountScreen(
             onBackPressed = navController::popBackStack,
-            dataTable = { dataTable, payload ->
-//                navController.navigateDataTableList(dataTable, payload, Constants.CLIENT_LOAN)
-//                TODO()
-            }
+            dataTable = navController::navigateDataTableList
         )
 
         addSavingsAccountScreen(
@@ -166,9 +164,8 @@ fun Navigation(
             onActivateCenter = navController::navigateToActivateScreen,
             addSavingsAccount = {
                 navController.navigateToAddSavingsAccount(it, 0, true)
-            },
-
-            )
+            }
+        )
 
         reportNavGraph(
             navController = navController

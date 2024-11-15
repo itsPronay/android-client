@@ -1,5 +1,6 @@
 package com.mifos.feature.loan.navigation
 
+import android.icu.text.MeasureFormat.FormatWidth
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -10,15 +11,16 @@ import com.mifos.core.common.utils.Constants
 import com.mifos.core.data.LoansPayload
 import com.mifos.core.objects.accounts.loan.LoanWithAssociations
 import com.mifos.core.objects.noncore.DataTable
-import com.mifos.feature.loan.group_loan_account.GroupLoanAccountScreen
-import com.mifos.feature.loan.loan_account.LoanAccountScreen
-import com.mifos.feature.loan.loan_account_summary.LoanAccountSummaryScreen
-import com.mifos.feature.loan.loan_approval.LoanAccountApprovalScreen
-import com.mifos.feature.loan.loan_charge.LoanChargeScreen
-import com.mifos.feature.loan.loan_disbursement.LoanAccountDisbursementScreen
-import com.mifos.feature.loan.loan_repayment.LoanRepaymentScreen
-import com.mifos.feature.loan.loan_repayment_schedule.LoanRepaymentScheduleScreen
-import com.mifos.feature.loan.loan_transaction.LoanTransactionsScreen
+import com.mifos.feature.data_table.dataTableList.FormWidget
+import com.mifos.feature.loan.groupLoanAccount.GroupLoanAccountScreen
+import com.mifos.feature.loan.loanAccount.LoanAccountScreen
+import com.mifos.feature.loan.loanAccountSummary.LoanAccountSummaryScreen
+import com.mifos.feature.loan.loanApproval.LoanAccountApprovalScreen
+import com.mifos.feature.loan.loanCharge.LoanChargeScreen
+import com.mifos.feature.loan.loanDisbursement.LoanAccountDisbursementScreen
+import com.mifos.feature.loan.loanRepayment.LoanRepaymentScreen
+import com.mifos.feature.loan.loanRepaymentSchedule.LoanRepaymentScheduleScreen
+import com.mifos.feature.loan.loanTransaction.LoanTransactionsScreen
 
 /**
  * Created by Pronay Sarker on 16/08/2024 (2:24 AM)
@@ -83,7 +85,7 @@ fun NavGraphBuilder.groupLoanScreen(
 
 fun NavGraphBuilder.addLoanAccountScreen(
     onBackPressed: () -> Unit,
-    dataTable: (List<DataTable>, LoansPayload) -> Unit
+    dataTable: (List<DataTable>, Int, LoansPayload, MutableList<List<FormWidget>>) -> Unit
 ) {
     composable(
         route = LoanScreens.LoanAccountScreen.route,
@@ -93,7 +95,13 @@ fun NavGraphBuilder.addLoanAccountScreen(
     ) {
         LoanAccountScreen(
             onBackPressed = onBackPressed,
-            dataTable = dataTable
+            dataTable = { dataTable, payload ->
+                /** TODO()
+                 * DatatableList expects a list of FormWidgets, for now it's
+                 *  getting fixed by using mutablelistof. Need to get it fixed  */
+                val demoFormWidget: MutableList<List<FormWidget>> = mutableListOf()
+                dataTable(dataTable, Constants.CLIENT_LOAN, payload, demoFormWidget)
+            }
         )
     }
 }

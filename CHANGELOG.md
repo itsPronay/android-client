@@ -40,7 +40,7 @@ What's New?
 For Developers :
 
 *Espresso Integrated
-
+ 
 ##0.2.0-alpha
 * Fixed #66 - App Crashed on Android 2.3 Due to setShowAsAction method.
 * Fixed #65 - App Crashed on Android 2.3 due to a different lifecycle call.

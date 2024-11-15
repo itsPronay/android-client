@@ -11,6 +11,7 @@ android {
 dependencies {
 
     implementation(projects.core.domain)
+    implementation(project(":feature:data-table"))
 
     //DBFlow dependencies
     kapt(libs.dbflow.processor)
