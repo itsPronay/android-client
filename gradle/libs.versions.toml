@@ -137,7 +137,7 @@ ktorfit = "2.2.0"
 ktorfitKsp = "2.2.0-1.0.27"
 
 #CMP Libraries
-compose-plugin = "1.7.0"
+compose-plugin = "1.7.0-rc01"
 wire = "5.0.0"
 
 [libraries]
@@ -439,7 +439,6 @@ jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 ktrofit = { id = "de.jensklingenberg.ktorfit", version.ref = "ktorfit" }
 wire = { id = "com.squareup.wire", version.ref = "wire" }
-
 
 # Plugins defined by this project
 mifos-android-application = { id = "mifos.android.application", version = "unspecified" }

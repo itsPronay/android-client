@@ -1,4 +1,5 @@
-import com.android.build.api.dsl.LibraryExtension
+
+import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -7,7 +8,6 @@ import org.mifos.configureFlavors
 import org.mifos.configureKotlinAndroid
 import org.mifos.configureKotlinMultiplatform
 import org.mifos.libs
-
 /**
  * Created by Pronay Sarker on 30/12/2024 (7:33 PM)
  */
@@ -19,6 +19,8 @@ class KMPLibraryConventionPlugin : Plugin<Project> {
                 apply("com.android.library")
                 apply("org.jetbrains.kotlin.multiplatform")
                 apply("mifos.kmp.koin")
+                apply("mifos.detekt.plugin")
+                apply("mifos.spotless.plugin")
             }
 
             configureKotlinMultiplatform()

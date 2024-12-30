@@ -6,7 +6,7 @@ import org.mifos.libs
 /**
  * Created by Pronay Sarker on 30/12/2024 (7:30 PM)
  */
-class KMMKoinConventionPlugin : Plugin<Project> {
+class KMPKoinConventionPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         with(target){
