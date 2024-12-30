@@ -24,6 +24,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.secrets)
     alias(libs.plugins.androidx.navigation)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
