@@ -26,13 +26,4 @@ class ListTypeConverters {
         return Json.encodeToString(list)
     }
 
-    @TypeConverter
-    fun currencyToJson(currency: Currency?): String? {
-        return currency?.let { Json.encodeToString(it) }
-    }
-
-    @TypeConverter
-    fun jsonToCurrency(json: String?): Currency? {
-        return json?.let { Json.decodeFromString(it) }
-    }
 }
