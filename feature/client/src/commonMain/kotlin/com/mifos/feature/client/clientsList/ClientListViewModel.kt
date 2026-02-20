@@ -52,7 +52,10 @@ internal class ClientListViewModel(
         when (action) {
             is ClientListAction.RefreshClients -> refreshClients()
             is ClientListAction.OnDismissDialog -> dismissDialog()
-            is ClientListAction.OnClientClick -> sendEvent(ClientListEvent.OnClientClick(action.clientId))
+            is ClientListAction.OnClientClick -> {
+                resetSearch()
+                sendEvent(ClientListEvent.OnClientClick(action.clientId))
+            }
             is ClientListAction.Internal.ReceiveClientResult -> handleClientResult(action.result)
             is ClientListAction.Internal.ReceiveClientResultFromDb -> handleClientResultFromDb(action.result)
             is ClientListAction.FetchImage -> fetchClientImage(action.clientId)
@@ -64,19 +67,14 @@ internal class ClientListViewModel(
                 }
             }
             ClientListAction.DismissSearch -> {
-                updateState {
-                    it.copy(
-                        isSearchActive = false,
-                    )
-                }
+                resetSearch()
             }
-            ClientListAction.NavigateToCreateClient -> sendEvent(ClientListEvent.NavigateToCreateClient)
+            ClientListAction.NavigateToCreateClient -> {
+//                resetSearch()
+                sendEvent(ClientListEvent.NavigateToCreateClient)
+            }
             is ClientListAction.OnQueryChange -> {
-                updateState {
-                    it.copy(
-                        searchQuery = action.query,
-                    )
-                }
+                applySearchFilter(action.query)
             }
 
             ClientListAction.ToggleFilterVisibility -> toggleFilterVisibility()
@@ -149,12 +147,18 @@ internal class ClientListViewModel(
                 )
             }
 
-            is DataState.Success -> updateState {
-                val data = result.data.pageItems
-                if (data.isEmpty()) {
-                    it.copy(isEmpty = true, dialogState = null)
-                } else {
-                    it.copy(clients = data, dialogState = null, unfilteredClients = data)
+            is DataState.Success -> {
+                updateState {
+                    val data = result.data.pageItems
+                    if (data.isEmpty()) {
+                        it.copy(isEmpty = true, dialogState = null)
+                    } else {
+                        it.copy(clients = data, dialogState = null, unfilteredClients = data)
+                    }
+                }
+                // Apply search filter if active
+                if (state.searchQuery.isNotEmpty()) {
+                    applySearchFilter(state.searchQuery)
                 }
             }
         }
@@ -203,6 +207,10 @@ internal class ClientListViewModel(
                 clients = sortedList,
             )
         }
+        // Reapply search filter if active
+        if (state.searchQuery.isNotEmpty()) {
+            applySearchFilter(state.searchQuery)
+        }
     }
 
     private fun toggleFilterVisibility() {
@@ -248,22 +256,67 @@ internal class ClientListViewModel(
 
                 return statusMatch && officeMatch
             }
-            val filteredList = it.unfilteredClients.filter { client ->
+
+            // First apply search filter if active
+            val searchQueryLower = it.searchQuery.lowercase().trim()
+            val searchFilteredList = if (searchQueryLower.isEmpty()) {
+                it.unfilteredClients
+            } else {
+                it.unfilteredClients.filter { client ->
+                    val displayNameMatch = client.displayName?.lowercase()?.contains(searchQueryLower) == true
+                    val accountNoMatch = client.accountNo?.lowercase()?.contains(searchQueryLower) == true
+                    displayNameMatch || accountNoMatch
+                }
+            }
+
+            // Then apply status and office filters
+            val filteredList = searchFilteredList.filter { client ->
                 keep(client)
             }
 
-            val filteredFlow = it.unfilteredClientsFlow?.map { clients ->
-                clients.filter { client ->
+            val filteredFlow = it.unfilteredClientsFlow?.map { pagingData ->
+                // Apply search filter
+                val searchFiltered = if (searchQueryLower.isEmpty()) {
+                    pagingData
+                } else {
+                    pagingData.filter { client ->
+                        val displayNameMatch = client.displayName?.lowercase()?.contains(searchQueryLower) == true
+                        val accountNoMatch = client.accountNo?.lowercase()?.contains(searchQueryLower) == true
+                        displayNameMatch || accountNoMatch
+                    }
+                }
+                // Apply status and office filters
+                searchFiltered.filter { client ->
                     keep(client)
                 }
             }
+
+            // Apply sorting if any
+            val sortedList = when (it.sort) {
+                SortTypes.NAME -> filteredList.sortedBy { it.displayName?.lowercase() }
+                SortTypes.ACCOUNT_NUMBER -> filteredList.sortedBy { it.accountNo }
+                SortTypes.EXTERNAL_ID -> filteredList.sortedBy { it.externalId }
+                else -> filteredList
+            }
+
             it.copy(
                 selectedStatus = newSelectedStatus,
                 selectedOffices = newSelectedOffices,
-                clients = filteredList,
+                clients = sortedList,
                 clientsFlow = filteredFlow,
             )
         }
+    }
+
+    private fun resetSearch() {
+        updateState {
+            it.copy(
+                isSearchActive = false,
+                searchQuery = "",
+            )
+        }
+        // Restore unfiltered clients
+        applySearchFilter("")
     }
 
     private fun clearFilters() {
@@ -274,6 +327,79 @@ internal class ClientListViewModel(
                 sort = null,
                 selectedStatus = emptyList(),
                 selectedOffices = emptyList(),
+            )
+        }
+        // Reapply search filter if active
+        if (state.searchQuery.isNotEmpty()) {
+            applySearchFilter(state.searchQuery)
+        }
+    }
+
+    private fun applySearchFilter(query: String) {
+        updateState {
+            val searchQueryLower = query.lowercase().trim()
+
+            // Helper function to check if client matches search query
+            fun matchesSearch(client: ClientEntity): Boolean {
+                if (searchQueryLower.isEmpty()) return true
+
+                val displayNameMatch = client.displayName?.lowercase()?.contains(searchQueryLower) == true
+                val accountNoMatch = client.accountNo?.lowercase()?.contains(searchQueryLower) == true
+
+                return displayNameMatch || accountNoMatch
+            }
+
+            // Apply search filter to list
+            val filteredList = if (searchQueryLower.isEmpty()) {
+                it.unfilteredClients
+            } else {
+                it.unfilteredClients.filter { matchesSearch(it) }
+            }
+
+            // Apply search filter to flow
+            val filteredFlow = if (searchQueryLower.isEmpty()) {
+                it.unfilteredClientsFlow
+            } else {
+                it.unfilteredClientsFlow?.map { pagingData ->
+                    pagingData.filter { matchesSearch(it) }
+                }
+            }
+
+            // Apply status and office filters if any
+            val finalFilteredList = if (it.selectedStatus.isEmpty() && it.selectedOffices.isEmpty()) {
+                filteredList
+            } else {
+                filteredList.filter { client ->
+                    val statusMatch = it.selectedStatus.isEmpty() || client.status?.value in it.selectedStatus
+                    val officeMatch = it.selectedOffices.isEmpty() || (client.officeName ?: "Null") in it.selectedOffices
+                    statusMatch && officeMatch
+                }
+            }
+
+            val finalFilteredFlow = filteredFlow?.map { pagingData ->
+                if (it.selectedStatus.isEmpty() && it.selectedOffices.isEmpty()) {
+                    pagingData
+                } else {
+                    pagingData.filter { client ->
+                        val statusMatch = it.selectedStatus.isEmpty() || client.status?.value in it.selectedStatus
+                        val officeMatch = it.selectedOffices.isEmpty() || (client.officeName ?: "Null") in it.selectedOffices
+                        statusMatch && officeMatch
+                    }
+                }
+            }
+
+            // Apply sorting if any
+            val sortedList = when (it.sort) {
+                SortTypes.NAME -> finalFilteredList.sortedBy { it.displayName?.lowercase() }
+                SortTypes.ACCOUNT_NUMBER -> finalFilteredList.sortedBy { it.accountNo }
+                SortTypes.EXTERNAL_ID -> finalFilteredList.sortedBy { it.externalId }
+                else -> finalFilteredList
+            }
+
+            it.copy(
+                searchQuery = query,
+                clients = sortedList,
+                clientsFlow = finalFilteredFlow,
             )
         }
     }

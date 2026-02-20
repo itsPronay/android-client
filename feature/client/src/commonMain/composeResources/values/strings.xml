@@ -659,5 +659,6 @@
     <string name="feature_client_status_overpaid">Overpaid</string>
     <string name="feature_client_status_waiting">Waiting for Disbursal</string>
     <string name="feature_client_status_pending">Pending Approval</string>
+    <string name="feature_client_no_match_found">No match found</string>
 
 </resources>

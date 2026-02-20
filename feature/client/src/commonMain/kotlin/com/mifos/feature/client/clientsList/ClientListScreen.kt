@@ -37,6 +37,7 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,6 +57,7 @@ import com.mifos.core.designsystem.theme.MifosTypography
 import com.mifos.core.ui.components.MifosEmptyCard
 import com.mifos.core.ui.components.MifosProgressIndicator
 import com.mifos.core.ui.components.MifosRowCard
+import com.mifos.core.ui.components.MifosSearchBar
 import com.mifos.core.ui.util.EventsEffect
 import com.mifos.core.ui.util.TextUtil
 import com.mifos.room.entities.client.ClientEntity
@@ -73,6 +75,16 @@ internal fun ClientListScreen(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
+
+    // Reset search when navigating away from this screen
+    DisposableEffect(state.isSearchActive) {
+        val wasSearchActive = state.isSearchActive
+        onDispose {
+            if (wasSearchActive) {
+                viewModel.trySendAction(ClientListAction.DismissSearch)
+            }
+        }
+    }
 
     if (state.isFilterVisible) {
         FilterBottomSheet(
@@ -149,42 +161,48 @@ private fun ClientActions(
                             .size(DesignToken.sizes.iconAverage),
                     )
                 }
-//                Icon(
-//                    imageVector = MifosIcons.Search,
-//                    contentDescription = null,
-//                    modifier = Modifier
-//                        .size(DesignToken.sizes.iconAverage)
-//                        .clickable{
-//                            onAction(ClientListAction.ActivateSearch)
-//                        },
-//                )
+            } else {
+                MifosSearchBar(
+                    query = state.searchQuery,
+                    onQueryChange = {
+                        onAction(ClientListAction.OnQueryChange(it))
+                    },
+                    onBackClick = {
+                        onAction(ClientListAction.DismissSearch)
+                    },
+                    onSearchClick = {
+                        // not needed as search is performed automatically on query change
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
-//            else{
-//                MifosSearchBar(
-//                    query = state.searchQuery,
-//                    onQueryChange = {
-//                        onAction(ClientListAction.OnQueryChange(it))
-//                    },
-//                    onBackClick = {
-//                        onAction(ClientListAction.DismissSearch)
-//                    },
-//                    onSearchClick = {
-//
-//                    },
-//                    modifier = Modifier.fillMaxWidth()
-//                )
-//            }
         }
         Spacer(Modifier.width(DesignToken.padding.largeIncreased))
-        Icon(
-            imageVector = MifosIcons.Filter,
-            contentDescription = null,
-            modifier = Modifier
-                .size(DesignToken.sizes.iconAverage)
-                .clickable {
-                    toggleFilterVisibility()
-                },
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(DesignToken.padding.medium),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (!state.isSearchActive) {
+                Icon(
+                    imageVector = MifosIcons.Search,
+                    contentDescription = "Search",
+                    modifier = Modifier
+                        .size(DesignToken.sizes.iconAverage)
+                        .clickable {
+                            onAction(ClientListAction.ActivateSearch)
+                        },
+                )
+            }
+            Icon(
+                imageVector = MifosIcons.Filter,
+                contentDescription = "Filter",
+                modifier = Modifier
+                    .size(DesignToken.sizes.iconAverage)
+                    .clickable {
+                        toggleFilterVisibility()
+                    },
+            )
+        }
     }
 }
 

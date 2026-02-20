@@ -85,9 +85,6 @@ internal fun ClientListScreen(
     onClientSelect: (Int) -> Unit,
     viewModel: ClientListViewModel = koinViewModel(),
 ) {
-    LaunchedEffect(key1 = true) {
-        viewModel.getClientList()
-    }
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
     val pullToRefreshState = rememberPullToRefreshState()
 
