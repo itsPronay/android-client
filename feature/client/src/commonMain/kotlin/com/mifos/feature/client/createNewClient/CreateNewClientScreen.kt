@@ -1292,7 +1292,7 @@ private fun isAddressTypeIdValid(
     snackbarHostState: SnackbarHostState,
 ): Boolean {
     return when {
-        addressTypeId < 0 -> {
+        addressTypeId <= 0 -> {
             scope.launch {
                 snackbarHostState.showSnackbar(
                     message = getString(
@@ -1300,7 +1300,7 @@ private fun isAddressTypeIdValid(
                     ),
                 )
             }
-            return false
+            false
         }
 
         else -> true
